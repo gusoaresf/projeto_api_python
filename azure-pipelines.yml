@@ -3,11 +3,11 @@ trigger:
     include:
       - main
 
-# Configura o pool para usar o agente self-hosted chamado "hosted agent"
+# Define o pool usando o agente self-hosted específico
 pool:
-  name: 'Azure Pipelines'  # Substitua pelo nome do pool onde o agente está configurado, se for diferente de "Default"
+  name: 'Azure Pipelines'  # Nome do pool onde o Hosted Agent está configurado
   demands:
-    - agent.name -equals 'hosted agent'  # Nome do seu agente self-hosted
+    - agent.name -equals 'Hosted Agent'  # Nome exato do seu agente self-hosted
 
 variables:
   # Versão do Python a ser usada
