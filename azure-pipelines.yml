@@ -1,0 +1,36 @@
+# azure-pipelines.yml
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  # Variável para definir o ambiente do Python
+  PYTHON_VERSION: '3.9'
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '$(PYTHON_VERSION)'
+    addToPath: true
+
+# Instalação das dependências
+- script: |
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+  displayName: 'Instala dependências'
+
+# Executa testes (caso tenha testes)
+- script: |
+    pytest tests/
+  displayName: 'Executa testes'
+
+# Publica os artefatos para a pipeline de Release
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: '$(System.DefaultWorkingDirectory)'
+    artifactName: 'drop'
+    publishLocation: 'Container'
