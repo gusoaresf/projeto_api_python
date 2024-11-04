@@ -1,34 +1,37 @@
-# azure-pipelines.yml
 trigger:
   branches:
     include:
       - main
 
+# Configura o pool para usar o agente self-hosted chamado "hosted agent"
 pool:
-  vmImage: 'ubuntu-latest'
+  name: 'Azure Pipelines'  # Substitua pelo nome do pool onde o agente está configurado, se for diferente de "Default"
+  demands:
+    - agent.name -equals 'hosted agent'  # Nome do seu agente self-hosted
 
 variables:
-  # Variável para definir o ambiente do Python
+  # Versão do Python a ser usada
   PYTHON_VERSION: '3.9'
 
 steps:
+# Configura a versão do Python no ambiente do agente
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '$(PYTHON_VERSION)'
     addToPath: true
 
-# Instalação das dependências
+# Instala as dependências do projeto usando o pip
 - script: |
     python -m pip install --upgrade pip
     pip install -r requirements.txt
   displayName: 'Instala dependências'
 
-# Executa testes (caso tenha testes)
+# Executa testes (caso tenha testes configurados)
 - script: |
     pytest tests/
   displayName: 'Executa testes'
 
-# Publica os artefatos para a pipeline de Release
+# Publica os artefatos gerados na build para a pipeline de Release
 - task: PublishBuildArtifacts@1
   inputs:
     pathToPublish: '$(System.DefaultWorkingDirectory)'
