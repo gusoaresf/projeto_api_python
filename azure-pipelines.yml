@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 trigger:
   branches:
     include:
@@ -48,3 +49,42 @@ steps:
     source $(System.DefaultWorkingDirectory)/set_env.sh
     flask run --host=0.0.0.0 --port=5000
   displayName: '
+=======
+# Python package
+# Create and test a Python package on multiple Python versions.
+# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+strategy:
+  matrix:
+    Python38:
+      python.version: '3.8'
+    Python39:
+      python.version: '3.9'
+    Python310:
+      python.version: '3.10'
+    Python311:
+      python.version: '3.11'
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '$(python.version)'
+  displayName: 'Use Python $(python.version)'
+
+- script: |
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+  displayName: 'Install dependencies'
+
+- script: |
+    pip install pytest pytest-azurepipelines
+    pytest
+  displayName: 'pytest'
+>>>>>>> f231612ee0f9f7994578e146f135d2d4edfcdb2b
