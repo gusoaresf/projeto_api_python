@@ -1,0 +1,50 @@
+trigger:
+  branches:
+    include:
+      - main  # Define o branch principal para o gatilho do pipeline
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  FLASK_APP: "app.py" # Nome do seu arquivo Flask principal
+  ORACLE_USER: "rm97850"
+  ORACLE_PASSWORD: "120803"
+  ORACLE_DSN: "oracle.fiap.com.br:1521/ORCL"
+
+steps:
+# 1. Instalar o Python
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.x'
+    addToPath: true
+
+# 2. Instalar Dependências
+- script: |
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+  displayName: 'Instalar dependências'
+
+# 3. Configuração de Variáveis de Ambiente
+- task: Bash@3
+  inputs:
+    targetType: 'inline'
+    script: |
+      echo "Configurar variáveis de ambiente"
+      echo "export ORACLE_USER=$(ORACLE_USER)" >> $(System.DefaultWorkingDirectory)/set_env.sh
+      echo "export ORACLE_PASSWORD=$(ORACLE_PASSWORD)" >> $(System.DefaultWorkingDirectory)/set_env.sh
+      echo "export ORACLE_DSN=$(ORACLE_DSN)" >> $(System.DefaultWorkingDirectory)/set_env.sh
+      echo "export FLASK_APP=$(FLASK_APP)" >> $(System.DefaultWorkingDirectory)/set_env.sh
+  displayName: 'Configurar variáveis de ambiente'
+
+# 4. Executar Testes
+- script: |
+    source $(System.DefaultWorkingDirectory)/set_env.sh
+    python -m unittest discover -s tests
+  displayName: 'Executar testes'
+
+# 5. Executar Aplicação (opcional para testes em Dev)
+- script: |
+    source $(System.DefaultWorkingDirectory)/set_env.sh
+    flask run --host=0.0.0.0 --port=5000
+  displayName: '
